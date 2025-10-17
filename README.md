@@ -29,7 +29,7 @@ Activité_2_2/ : Échange d’objets sérialisables pour effectuer des calculs a
 
 💻 Environnement
 
-Java JDK 1.8 ou supérieur
+Java JDK 1.8
 
 IDE : Eclipse
 
