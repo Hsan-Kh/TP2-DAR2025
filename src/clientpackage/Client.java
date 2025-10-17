@@ -3,35 +3,42 @@ package clientpackage;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import formatoperation.Operation;
 
 public class Client {
     public static void main(String[] args) {
-        try {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Je suis un client pas encore connecté...");
+        try (Socket socket = new Socket("localhost", 6000)) {
 
-            Socket socket = new Socket("localhost", 4730);
-            System.out.println("Je suis un client connecté au serveur.");
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            Scanner sc = new Scanner(System.in);
 
-            System.out.println("Entrez une opération (ex : 15+5) : ");
-            String operation = scanner.nextLine();
+            System.out.print("Entrez le premier nombre : ");
+            double a = sc.nextDouble();
 
-            out.println(operation);
-            System.out.println("Opération envoyée : " + operation);
+            System.out.print("Entrez l'opérateur (+, -, *, /) : ");
+            String opStr = sc.next();
 
-            String resultat = in.readLine();
-            System.out.println("Résultat reçu du serveur : " + resultat);
+            if (opStr.length() != 1 || "+-*/".indexOf(opStr.charAt(0)) == -1) {
+                System.out.println("Opérateur invalide !");
+                sc.close();
+                return;
+            }
+            char op = opStr.charAt(0);
 
-            in.close();
-            out.close();
+            System.out.print("Entrez le deuxième nombre : ");
+            double b = sc.nextDouble();
+
+            Operation operation = new Operation(a, b, op);
+            out.writeObject(operation);
+
+            Object result = in.readObject();
+            System.out.println("Résultat reçu du serveur : " + result);
+
+            sc.close();
             socket.close();
-            scanner.close();
-            System.out.println("Client déconnecté.");
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

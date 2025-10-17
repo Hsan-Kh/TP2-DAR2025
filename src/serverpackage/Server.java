@@ -2,74 +2,48 @@ package serverpackage;
 
 import java.io.*;
 import java.net.*;
+import formatoperation.Operation;
 
 public class Server {
     public static void main(String[] args) {
-        try {
-            ServerSocket serverSocket = new ServerSocket(4730);
-            System.out.println("Serveur démarré. En attente de connexion d’un client...");
+        try (ServerSocket serverSocket = new ServerSocket(6000)) {
+            System.out.println("Serveur en attente de connexion...");
 
             Socket socket = serverSocket.accept();
-            System.out.println("Un client est connecté.");
+            System.out.println("Client connecté !");
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            String operation = in.readLine();
-            System.out.println("Opération reçue du client : " + operation);
+            Operation op = (Operation) in.readObject();
 
-            String resultat = calculer(operation);
+            Object resultat; 
 
-            out.println(resultat);
-            System.out.println("Résultat envoyé au client : " + resultat);
+            double op1 = op.getOp1();
+            double op2 = op.getOp2();
+            char operateur = op.getOperateur();
 
-            in.close();
-            out.close();
+            if (!(operateur == '+' || operateur == '-' || operateur == '*' || operateur == '/')) {
+                resultat = "Opérateur non reconnu !";
+            } else {
+                switch (operateur) {
+                    case '+': resultat = op1 + op2; break;
+                    case '-': resultat = op1 - op2; break;
+                    case '*': resultat = op1 * op2; break;
+                    case '/':
+                        if (op2 == 0) resultat = "Erreur : division par zéro";
+                        else resultat = op1 / op2;
+                        break;
+                    default: resultat = "Opérateur non reconnu !";
+                }
+            }
+
+            out.writeObject(resultat);
+            System.out.println("Résultat envoyé : " + resultat);
+
             socket.close();
-            serverSocket.close();
-            System.out.println("Connexion fermée. Serveur arrêté.");
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private static String calculer(String operation) {
-        operation = operation.trim();
-
-        char operateur = 0;
-        for (char c : operation.toCharArray()) {
-            if (c == '+' || c == '-' || c == '*' || c == '/') {
-                operateur = c;
-                break;
-            }
-        }
-
-        if (operateur == 0) return "Opérateur invalide. Utilisez +, -, * ou /";
-
-        String[] elements = operation.split("\\" + operateur);
-        if (elements.length != 2) return "Format invalide. Ex : 15+5";
-
-        try {
-            double op1 = Double.parseDouble(elements[0].trim());
-            double op2 = Double.parseDouble(elements[1].trim());
-
-            double resultat;
-            switch (operateur) {
-                case '+': resultat = op1 + op2; break;
-                case '-': resultat = op1 - op2; break;
-                case '*': resultat = op1 * op2; break;
-                case '/':
-                    if (op2 == 0) return "Erreur : division par zéro";
-                    resultat = op1 / op2;
-                    break;
-                default: return "Opérateur invalide. Utilisez +, -, * ou /";
-            }
-
-            return "Résultat : " + resultat;
-
-        } catch (NumberFormatException e) {
-            return "Erreur : opérandes non valides.";
         }
     }
 }
