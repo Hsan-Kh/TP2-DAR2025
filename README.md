@@ -15,11 +15,8 @@ Projet : Client/Serveur – Échange de chaînes de caractères et d’objets
 Description du TP
 
 Ce TP vise à approfondir les connaissances en développement d’applications réparties en Java utilisant des sockets TCP. Il consiste à étendre l’application Client/Serveur pour :
-
 Permettre l’échange de chaînes de caractères représentant des opérations arithmétiques complètes entre le client et le serveur.
-
 Implémenter l’échange d’objets sérialisables contenant les informations nécessaires aux opérations.
-
 L’objectif est de comprendre la gestion des flux de données, la communication bidirectionnelle, la validation côté client et serveur, ainsi que l’utilisation des flux d’objets pour transmettre des données complexes.
 
 📂 Structure du repository
@@ -35,8 +32,6 @@ Activité_2_2/ : Échange d’objets sérialisables pour effectuer des calculs a
 Java JDK 1.8 ou supérieur
 
 IDE : Eclipse
-
-Sockets TCP pour la communication Client/Serveur
 
 📝 Description générale des activités
 
